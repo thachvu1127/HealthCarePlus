@@ -1,7 +1,9 @@
+import { Button } from "@/components/ui/button";
+
 export default function Home() {
   return (
-    <div className={"bg-primary"}>
-      <h1 className={"text-primary"}>Home</h1>
+    <div>
+      <Button variant={"outline"}>Button</Button>
     </div>
   );
 }

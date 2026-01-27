@@ -4,9 +4,6 @@
 
 /* ========================================== TAILWIND STYLES */
 
-@theme {
-    
-}
 
 /* Define utilities so they can be used with @apply */
 @utility remove-scrollbar {
