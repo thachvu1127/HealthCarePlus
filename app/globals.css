@@ -4,6 +4,10 @@
 
 /* ========================================== TAILWIND STYLES */
 
+@theme {
+    --color-destructive: #F24E43;
+    --color-destructive-foreground: #ffffff;
+}
 
 /* Define utilities so they can be used with @apply */
 @utility remove-scrollbar {
