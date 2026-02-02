@@ -23,8 +23,9 @@ export default function Home() {
           </Button>
 
           <PatientForm></PatientForm>
-          <div className={"text-14-regular mt-10 flex justify-between gap-2"}>
-            <p className={"justify-items-end text-dark-600 xl:text-left"}>
+
+          <div className={"text-14-regular mx-auto mt-3 flex gap-2"}>
+            <p className={"text-dark-600 xl:text-left"}>
               © {currentYear} HealthCare+.
             </p>
             <Link href={"/?admin=true"} className={"text-green-500"}>

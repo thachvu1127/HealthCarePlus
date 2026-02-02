@@ -17,8 +17,11 @@ import { formSchema, FormValues } from "@/lib/validations/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import user from "../../public/user.svg";
-import phone from "../../public/phone.svg";
 import email from "../../public/email.svg";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
+import SubmitButton from "@/components/SubmitButton";
+
 const PatientForm = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -26,8 +29,12 @@ const PatientForm = () => {
     mode: "onSubmit",
   });
 
-  function onsubmit(data: FormValues) {
-    console.log(data);
+  async function onsubmit(data: FormValues) {
+    // Simulate API call - replace with actual API logic later
+    try {
+      const { name, email, phonenumber } = data;
+      console.log(name, email, phonenumber);
+    } catch (error) {}
   }
 
   return (
@@ -112,22 +119,14 @@ const PatientForm = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="phone">Phone Number</FieldLabel>
-                  <div className="relative">
-                    <Image
-                      src={phone}
-                      alt={"icon"}
-                      height={22}
-                      width={22}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 bright invert"
-                    />
-                    <Input
+                  <div>
+                    <PhoneInput
                       {...field}
-                      id="phonenumber"
-                      autoComplete="off"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="+0000000000"
-                      className={`pl-10 ${fieldState.invalid ? "sha-error" : ""}`}
-                    />
+                      defaultCountry={"US"}
+                      className={"input-phone"}
+                      international
+                      withCountryCallingCode
+                    ></PhoneInput>
                   </div>
                   {fieldState.error && (
                     <FieldError errors={[fieldState.error]}></FieldError>
@@ -137,7 +136,7 @@ const PatientForm = () => {
             ></Controller>
           </FieldGroup>
         </FieldSet>
-        <div className={"flex flex-col  justify-center"}>
+        <div className={"flex flex-col justify-center gap-2"}>
           <Button
             onClick={() => form.reset()}
             variant={"outline"}
@@ -146,17 +145,9 @@ const PatientForm = () => {
           >
             Reset
           </Button>
-          <Button
-            role={"button"}
-            variant={"outline"}
-            className={`mt-4 ${
-              !form.formState.isDirty
-                ? "hover:cursor-not-allowed"
-                : "hover:cursor-pointer"
-            }`}
-          >
-            Sign Up
-          </Button>
+          <SubmitButton isLoading={form.formState.isSubmitting}>
+            Get Started
+          </SubmitButton>
         </div>
       </form>
     </div>
