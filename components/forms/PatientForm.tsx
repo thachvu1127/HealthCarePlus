@@ -16,25 +16,36 @@ import { Controller, useForm } from "react-hook-form";
 import { formSchema, FormValues } from "@/lib/validations/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import user from "../../public/user.svg";
+import userImage from "../../public/user.svg";
 import email from "../../public/email.svg";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import SubmitButton from "@/components/SubmitButton";
+import { useState } from "react";
+import { createUser } from "@/lib/actions/patient.actions";
+import { useRouter } from "next/navigation";
 
 const PatientForm = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", email: "", phonenumber: "" },
+    defaultValues: { name: "", email: "", phone: "" },
     mode: "onSubmit",
   });
 
   async function onsubmit(data: FormValues) {
-    // Simulate API call - replace with actual API logic later
+    // Simulate API call - replace it with actual API logic later
+    setLoading(true);
     try {
-      const { name, email, phonenumber } = data;
-      console.log(name, email, phonenumber);
-    } catch (error) {}
+      const { name, email, phone } = data;
+      const newUser = await createUser({ name, email, phone });
+      if (newUser) {
+        router.push(`/patients/${newUser.$id}/register`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -60,7 +71,7 @@ const PatientForm = () => {
                   <FieldLabel htmlFor="name">Full name</FieldLabel>
                   <div className="relative">
                     <Image
-                      src={user}
+                      src={userImage}
                       alt={"icon"}
                       height={24}
                       width={24}
@@ -114,7 +125,7 @@ const PatientForm = () => {
               )}
             />
             <Controller
-              name={"phonenumber"}
+              name={"phone"}
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
