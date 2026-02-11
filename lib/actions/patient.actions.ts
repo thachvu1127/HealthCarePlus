@@ -2,9 +2,14 @@
 
 import { users } from "@/lib/appwrite.config";
 import { ID } from "node-appwrite";
+import { parseStringify } from "@/lib/utils";
 
 export const createUser = async (user: CreateUserParams) => {
-  console.log("createUser called with:", { name: user.name, email: user.email, phone: user.phone });
+  console.log("createUser called with:", {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+  });
 
   try {
     const userId = ID.unique();
@@ -25,5 +30,14 @@ export const createUser = async (user: CreateUserParams) => {
     console.error("Error code:", error?.code);
     console.error("Error type:", error?.type);
     throw error;
+  }
+};
+
+export const getUsers = async (userId: string) => {
+  try {
+    const user = await users.get(userId);
+    return parseStringify(user);
+  } catch (error) {
+    console.log(error);
   }
 };
