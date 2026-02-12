@@ -22,10 +22,11 @@ const Register = ({ params: { userId } }: SearchParamProps) => {
               height={50}
               className={"rounded-xl h-10 w-fit"}
             />
-            <h3>HealthCare+</h3>
+            <h1>HealthCare+</h1>
           </Button>
 
-          {/*<RegisterForm></RegisterForm>*/}
+          <RegisterForm></RegisterForm>
+
           <div className={"text-14-regular mx-auto mt-3 flex gap-2"}>
             <p className={"text-dark-600 xl:text-left"}>
               © {currentYear} HealthCare+.

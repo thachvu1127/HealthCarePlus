@@ -1,6 +1,7 @@
 "use client";
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
@@ -13,91 +14,162 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
-import { formSchema, FormValues } from "@/lib/validations/schemas";
+import { registerSchema } from "@/lib/validations/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
-import userImage from "../../public/user.svg";
-import email from "../../public/email.svg";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
-import SubmitButton from "@/components/SubmitButton";
 import { useState } from "react";
-import { createUser } from "@/lib/actions/patient.actions";
-import { useRouter } from "next/navigation";
+import { z } from "zod";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const RegisterForm = ({ user }: { user: User }) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: "", email: "", phone: "" },
-    mode: "onSubmit",
+const RegisterForm = () => {
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      birthDate: new Date(),
+      gender: "male",
+    },
   });
-
-  async function onsubmit(data: FormValues) {
-    // Simulate API call - replace it with actual API logic later
-    setLoading(true);
-    try {
-      const { name, email, phone } = data;
-      const newUser = await createUser({ name, email, phone });
-      if (newUser) {
-        router.push(`/patients/${newUser.$id}/register`);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   return (
     <div className={"w-full max-w-md  p-6 shadow-sm "}>
-      <form
-        className={"space-y-12 flex-1"}
-        onSubmit={form.handleSubmit(onsubmit)}
-      >
-        <section className={"space-y-12 flex-1"}>
-          <h1 className={"header"}>Welcome</h1>
+      <form className={"space-y-6 flex-1"}>
+        <section className={"space-y-6 flex-1"}>
+          <h2 className={"text-24-bold"}>Welcome,</h2>
           <p className={"text-dark-700"}>Tell us more about yourself</p>
         </section>
-        <section className={"space-y-4"}>
-          <div className={"mb-9 space-y-1"}>
-            <h2 className={"sub-header"}>Personal Information</h2>
-          </div>
-        </section>
-        <FieldSet>
-          <FieldGroup>
-            {/* --- Full Name --*/}
+
+        <FieldSet className={"w-full"}>
+          <FieldLegend>Personal Information</FieldLegend>
+          <FieldGroup className={"flex"}>
             <Controller
               name={"name"}
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="name">Full name</FieldLabel>
-                  <div className="relative">
-                    <Image
-                      src={userImage}
-                      alt={"icon"}
-                      height={24}
-                      width={24}
-                      className="absolute left-3 top-1/2 -translate-y-1/2"
-                    />
-                    <Input
-                      {...field}
-                      id="name"
-                      autoComplete="off"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="John Doe"
-                      className={`pl-10 ${fieldState.invalid ? "sha-error" : ""}`}
-                    />
-                  </div>
-
-                  {fieldState.error && (
-                    <FieldError errors={[fieldState.error]}></FieldError>
-                  )}
+                <Field>
+                  <FieldContent>
+                    <FieldLabel htmlFor={"name"}>Full Name</FieldLabel>
+                  </FieldContent>
+                  <Input
+                    {...field}
+                    id={"name"}
+                    placeholder={"John Doe"}
+                    aria-invalid={fieldState.invalid}
+                    autoComplete={"off"}
+                  ></Input>
                 </Field>
               )}
-            />
-
-            <FieldSeparator className={"bg-white h-[0.1px]"}></FieldSeparator>
+            ></Controller>
+            <FieldGroup className={"grid grid-cols-2 gap-4"}>
+              <Controller
+                name={"email"}
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor={"email"}>Email</FieldLabel>
+                    <Input
+                      {...field}
+                      id={"email"}
+                      placeholder={"Johndoe@gmail.com"}
+                      aria-invalid={fieldState.invalid}
+                      autoComplete={"off"}
+                      className={"input-phone w-full text-sm"}
+                    ></Input>
+                  </Field>
+                )}
+              ></Controller>
+              <Controller
+                name={"phone"}
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Phone Number</FieldLabel>
+                    <PhoneInput
+                      id={field.name}
+                      {...field}
+                      defaultCountry={"US"}
+                      className={"input-phone w-full"}
+                      international
+                      withCountryCallingCode
+                    ></PhoneInput>
+                    {fieldState.error && (
+                      <FieldError errors={[fieldState.error]}></FieldError>
+                    )}
+                  </Field>
+                )}
+              ></Controller>
+            </FieldGroup>
+            <FieldGroup className={"grid grid-cols-2 gap-4"}>
+              <Controller
+                name={"birthDate"}
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="date">Date of birth</FieldLabel>
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          id="date"
+                          className="justify-start font-normal"
+                        >
+                          {date ? date.toLocaleDateString() : "Select date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        {...field}
+                        className="w-full overflow-hidden p-2"
+                        align="start"
+                      >
+                        <Calendar
+                          className={"p-2"}
+                          mode="single"
+                          selected={date}
+                          defaultMonth={date}
+                          captionLayout="dropdown"
+                          onSelect={(date) => {
+                            setDate(date);
+                            setOpen(false);
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </Field>
+                )}
+              ></Controller>
+              <Field>
+                <FieldLabel>Gender</FieldLabel>
+                <Select>
+                  <SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value={"male"}>Male</SelectItem>
+                        <SelectItem value={"female"}>Female</SelectItem>
+                        <SelectItem value={"other"}>Other</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </SelectTrigger>
+                </Select>
+              </Field>
+            </FieldGroup>
           </FieldGroup>
         </FieldSet>
       </form>
@@ -105,3 +177,6 @@ const RegisterForm = ({ user }: { user: User }) => {
   );
 };
 export default RegisterForm;
+
+// FieldSet is used to group things logically together
+// FieldGroup purely for visuals

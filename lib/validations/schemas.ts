@@ -21,4 +21,25 @@ export const patientSchema = z.object({
     .refine((phone) => /^\+[1-9]\d{1,14}$/.test(phone), "Invalid phone number"),
 });
 
+export const registerSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Full name must be at least 2 characters")
+    .max(100, "Name is too long")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Name can only contain letters, spaces, hyphens, and apostrophes",
+    ),
+  email: z
+    .string()
+    .toLowerCase()
+    .max(100, "Email is too long")
+    .pipe(emailSchema),
+  phone: z
+    .string()
+    .refine((phone) => /^\+[1-9]\d{1,14}$/.test(phone), "Invalid phone number"),
+  birthDate: z.date().min(new Date(1900, 0, 1)),
+  gender: z.enum(["male", "female", "other"]),
+});
+
 export type PatientFormValues = z.infer<typeof patientSchema>;
